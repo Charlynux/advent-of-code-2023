@@ -41,7 +41,7 @@ type state = {numbers : number list; symbols : symbol list;};;
 
 let neighbors = [(1, 0); (1, -1); (0, -1); (-1, 0); (-1, -1)];;
 
-let is_number (c : char) : bool = '1' <= c && c <= '9';;
+let is_number (c : char) : bool = '0' <= c && c <= '9';;
 let is_symbol (c: char) : bool = c != '.';;
 
 type parsing_state = { number : number option;
@@ -239,5 +239,9 @@ let debug_not_part_numbers (s : state) =
       done;
     )
     not_part;;
+
+List.map (fun s -> (String.make 1 s.value)) game.symbols
+|> String.concat ","
+|> print_string ;;
 
 debug_not_part_numbers (parse_game (read_lines "../../data/day03.input"));;
