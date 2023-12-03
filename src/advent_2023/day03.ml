@@ -200,24 +200,44 @@ let game_map = let m = List.fold_left
       (fun acc s -> (DebugMap.add s.position (String.make 1 s.value) acc))
       m game.symbols;;
 
-for y = 0 to 139 do
-  for x = 0 to 139 do
-    print_string (match (DebugMap.find_opt (x, y) game_map) with
-                    None -> "."
-                  | Some c -> c)
-  done;
-  print_endline "";
-  flush stdout
-done
+let oc = open_out "../../data/day03.debug" in
+    for y = 0 to 139 do
+      for x = 0 to 139 do
+        Printf.fprintf oc "%s" (match (DebugMap.find_opt (x, y) game_map) with
+                                  None -> "."
+                                | Some c -> c)
+      done;
+      Printf.fprintf oc "\n";
+    done;
+    close_out oc;;
 
 let debug_not_part_numbers (s : state) =
   let sym = Points.of_list (List.map (fun s -> s.position) s.symbols) in
-  s.numbers
-  |> List.filter (fun n ->
-         sym
-         |> Points.inter (number_neighbors n.positions)
-         |> Points.cardinal
-         |> (fun n -> n = 0))
-  |> List.map (fun (n: number) -> n.value);;
+  let not_part = List.filter (fun n ->
+                     sym
+                     |> Points.inter (number_neighbors n.positions)
+                     |> Points.cardinal
+                     |> (fun n -> n = 0)) s.numbers in
+  List.iter
+    (fun n ->
+      let positions = (n.positions
+                         @ (Points.to_list (number_neighbors n.positions))) in
+      let (xs : int list) = List.map fst positions
+      and ys = List.map snd positions in
+      let x1 = (List.fold_left min (List.hd xs) (List.tl xs))
+      and x2 = (List.fold_left max (List.hd xs) (List.tl xs))
+      and y1 = (List.fold_left min (List.hd ys) (List.tl ys))
+      and y2 = (List.fold_left max (List.hd ys) (List.tl ys)) in
+      for y = y1 to y2 do
+        for x = x1 to x2 do
+          print_string (match (DebugMap.find_opt (x, y) game_map) with
+                          None -> "."
+                        | Some c -> c)
+        done;
+        flush stdout;
+        print_endline ""
+      done;
+    )
+    not_part;;
 
 debug_not_part_numbers (parse_game (read_lines "../../data/day03.input"));;
