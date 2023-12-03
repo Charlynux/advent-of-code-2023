@@ -112,7 +112,25 @@ let solve_part1 (lines : string list) : int =
 |> List.map parse_game
 |> List.filter (fun g -> List.for_all is_possible_part1 g.sets)
 |> List.map (fun g -> g.id)
-|> List.fold_left (+) 0;;
+  |> List.fold_left (+) 0;;
 
 solve_part1 (read_lines "../../data/day02-example.input");;
 solve_part1 (read_lines "../../data/day02.input");;
+
+(* max de chaque sets *)
+
+let max_of_cubes (a: set_of_cubes) (b: set_of_cubes) : set_of_cubes =
+  match (a, b) with
+    ({ red=r1; blue=b1; green=g1; },
+     { red=r2; blue=b2; green=g2; })
+    -> { red= (max r1 r2); blue= (max b1 b2); green= (max g1 g2); };;
+
+let solve_part2 (lines : string list) =
+  lines
+  |> List.map parse_game
+  |> List.map (fun g -> List.fold_left max_of_cubes empty_set g.sets)
+  |> List.map (fun set -> set.red * set.green * set.blue)
+  |> List.fold_left (+) 0;;
+
+solve_part2 (read_lines "../../data/day02-example.input");;
+solve_part2 (read_lines "../../data/day02.input");;
