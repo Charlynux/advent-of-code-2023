@@ -39,8 +39,6 @@ type number = { value: int; positions : point list; }
 type symbol = { value: char; position : point }
 type state = {numbers : number list; symbols : symbol list;};;
 
-let neighbors = [(1, 0); (1, -1); (0, -1); (-1, 0); (-1, -1)];;
-
 let is_number (c : char) : bool = '0' <= c && c <= '9';;
 let is_symbol (c: char) : bool = c != '.';;
 
@@ -245,3 +243,49 @@ List.map (fun s -> (String.make 1 s.value)) game.symbols
 |> print_string ;;
 
 debug_not_part_numbers (parse_game (read_lines "../../data/day03.input"));;
+
+let convert_state_for_part2 (numbers : number list) =
+  List.fold_left
+    (fun acc (n : number) -> List.fold_left
+                               (fun m p -> (DebugMap.add p n m))
+                               acc
+                               n.positions)
+    DebugMap.empty
+    numbers;;
+
+let neighbors = [(1, 0); (1, -1); (1, 1);
+                 (0, 1); (0, -1);
+                 (-1, 0); (-1, -1); (-1, 1);];;
+
+let compare_points (x0,y0) (x1,y1) =
+  match Stdlib.compare x0 x1 with
+    0 -> Stdlib.compare y0 y1
+  | c -> c;;
+
+module Number = struct
+  type t = number
+  let compare (n0 : number) (n1 : number) =
+    match Stdlib.compare n0.value n1.value with
+      0 -> compare_points (List.hd n0.positions) (List.hd n1.positions)
+    | c -> c
+end
+module Numbers = Set.Make(Number)
+
+
+let solve_part2 (state: state) =
+  let numbers = convert_state_for_part2 state.numbers in
+  state.symbols
+  |> List.filter (fun s -> s.value = '*')
+  |> List.map (fun s ->
+         (List.map (fun n -> add n s.position) neighbors
+          |> List.filter_map (fun p -> DebugMap.find_opt p numbers)
+          |> Numbers.of_list
+          |> Numbers.to_list
+          |> List.map (fun (n : number) -> n.value)
+       ))
+  |> List.filter (fun ns -> (List.length ns = 2))
+  |> List.map (fun ns -> (List.hd ns) * (List.hd (List.tl ns)))
+  |> List.fold_left (+) 0;;
+
+solve_part2 (parse_game (read_lines "../../data/day03-example.input"));;
+solve_part2 (parse_game (read_lines "../../data/day03.input"));;
