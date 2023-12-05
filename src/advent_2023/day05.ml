@@ -102,6 +102,9 @@ let parse_input_2 lines =
     | s :: tl -> loop converters (current @ [(parse_map s)]) tl in
   let seeds =  parse_seeds (List.hd lines)
   and converters = lines |> List.tl |> List.tl |> List.tl |> loop [] [] in
+  (seeds, converters);;
+
+let solve_part1 (seeds, converters) =
   let values =
     List.map
     (fun seed ->
@@ -110,7 +113,20 @@ let parse_input_2 lines =
        seed
        converters)
     seeds in
-    List.fold_left min (List.hd values) (List.tl values);;
+  List.fold_left min (List.hd values) (List.tl values);;
 
-parse_input_2 (read_lines "../../data/day05-example.input");;
-parse_input_2 (read_lines "../../data/day05.input");;
+let total_solve_part1 file = file |> read_lines |> parse_input_2 |> solve_part1;;
+
+total_solve_part1 "../../data/day05-example.input";;
+total_solve_part1 "../../data/day05.input";;
+
+let split_seeds seeds =
+  let rec loop ranges rest =
+    match rest with
+      [] -> ranges
+    | start :: count :: tl -> loop (ranges @ [(start, count)]) tl
+    | _ -> raise Not_found
+  in
+  loop [] seeds;;
+
+split_seeds (parse_seeds "seeds: 79 14 55 13");;
