@@ -84,3 +84,33 @@ parse_input (read_lines "../../data/day05-example.input");;
   IMPLEMENTATION NAIVE KO - GRANDS ENTIERS
   parse_input (read_lines "../../data/day05.input");;
  *)
+
+let is_in_bounds n (_, source, count)= (source <= n) && (n < (source + count));;
+let convert n (dest, source, _) = dest + (n - source);;
+
+let handle_seed converters seed =
+  match converters |> List.filter (is_in_bounds seed) with
+    [] -> seed
+  | converter :: [] -> convert seed converter
+  | _ -> raise Not_found;;
+
+let parse_input_2 lines =
+  let rec loop converters current ls =
+    match ls with
+      [] -> converters @ [current]
+    | "" :: _ :: tl -> loop (converters @ [current]) [] tl
+    | s :: tl -> loop converters (current @ [(parse_map s)]) tl in
+  let seeds =  parse_seeds (List.hd lines)
+  and converters = lines |> List.tl |> List.tl |> List.tl |> loop [] [] in
+  let values =
+    List.map
+    (fun seed ->
+       List.fold_left
+       (fun s c -> handle_seed c s)
+       seed
+       converters)
+    seeds in
+    List.fold_left min (List.hd values) (List.tl values);;
+
+parse_input_2 (read_lines "../../data/day05-example.input");;
+parse_input_2 (read_lines "../../data/day05.input");;
