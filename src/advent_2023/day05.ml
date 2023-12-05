@@ -130,3 +130,94 @@ let split_seeds seeds =
   loop [] seeds;;
 
 split_seeds (parse_seeds "seeds: 79 14 55 13");;
+
+"../../data/day05.input"
+|> read_lines
+|> List.hd
+|> parse_seeds
+|> split_seeds
+|> List.map snd
+|> List.fold_left (+) 0;;
+(* 2 504 127 863 seeds à considérer *)
+
+(*
+  dest, source, count + seed, offset
+  -> [seed, offset]
+  -> [seed, n] [n, m] [m, offset]
+
+  ................seed--------------------------------------seed_end
+  source --- end
+  ...............................................................source -- end
+  source---------------------------------------------------------end
+  ........source --- end
+  .......................................................source --- end
+  ....................... source --- end
+
+ *)
+
+let seed_range_conversion (seed, offset) (dest, source, count) =
+  let conversion_end = source + count
+  and seed_end = seed + offset in
+  match ((seed, offset), (dest, source, count)) with
+    _ when conversion_end < seed -> ([], [(seed, offset)])
+  | _ when seed_end < source -> ([], [(seed, offset)])
+  | _ when (source <= seed)
+           && (seed_end <= conversion_end) ->
+     ([(dest + (seed - source), offset)], [])
+  | _ when (source <= seed)
+           && (seed < conversion_end)
+           && (conversion_end <= seed_end) ->
+     (let cut = conversion_end - seed in
+      ([(dest + (seed - source), cut)], [(seed + cut, offset - cut)]))
+  | _ when (source <= seed_end)
+           && (seed_end <= conversion_end) ->
+     (let cut = seed_end - source in
+      ([(dest, cut)], [(seed, offset - cut)]))
+  | _ -> (let cut = source - seed
+          and cut_end = seed_end - conversion_end in
+          ([(dest, count)], [(seed, cut); (conversion_end, cut_end + 1)]));;
+
+seed_range_conversion
+  (80, 6)
+  (25, 82, 2);;
+
+let list_min xs = List.fold_left min (List.hd xs) (List.tl xs);;
+
+let handle_seed_range converters seed_range =
+  let rec loop converters (finishes, todos) =
+    if (List.length converters = 0) then
+      finishes @ todos
+    else if (List.length todos = 0) then
+      finishes
+    else
+      let conv = (List.hd converters) in
+      let (new_finishes, new_todos) = List.fold_left
+                  (fun (fs, tds) t ->
+                    (let (nfs, ntds) = seed_range_conversion t conv in
+                     (nfs @ fs, tds @ ntds)))
+                  (finishes, [])
+                  todos in
+      loop (List.tl converters) (new_finishes, new_todos)
+  in
+  loop converters ([], [seed_range]);;
+
+let solve_part2 (seeds, converters) =
+  let rec loop converters seed_ranges =
+    if (List.length converters = 0) then
+      seed_ranges
+    else
+      loop
+        (List.tl converters)
+        (List.concat_map
+           (fun seed_range ->
+             (handle_seed_range (List.hd converters) seed_range))
+           seed_ranges)
+  in
+  loop converters (split_seeds seeds);;
+
+let total_solve_part2 file = file |> read_lines |> parse_input_2 |> solve_part2
+                             |> List.map fst
+                             |> list_min;;
+
+total_solve_part2 "../../data/day05-example.input";;
+total_solve_part2 "../../data/day05.input";;
