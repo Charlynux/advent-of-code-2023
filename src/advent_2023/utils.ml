@@ -6,3 +6,7 @@ let read_lines name : string list =
     | Some s -> loop (s :: acc)
     | None -> close_in ic; List.rev acc in
   loop [];;
+
+let list_sum = List.fold_left (+) 0;;
+let list_min xs = List.fold_left min (List.hd xs) (List.tl xs);;
+let list_max xs = List.fold_left max (List.hd xs) (List.tl xs);;

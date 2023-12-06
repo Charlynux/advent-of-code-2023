@@ -175,8 +175,6 @@ seed_range_conversion
   (80, 6)
   (25, 82, 2);;
 
-let list_min xs = List.fold_left min (List.hd xs) (List.tl xs);;
-
 let handle_seed_range converters seed_range =
   let rec loop converters (finishes, todos) =
     if (List.length converters = 0) then

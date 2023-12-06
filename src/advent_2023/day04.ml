@@ -41,11 +41,11 @@ solve_line "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53";;
 
 read_lines "../../data/day04-example.input"
 |> List.map solve_line
-|> List.fold_left (+) 0;;
+|> list_num;;
 
 read_lines "../../data/day04.input"
 |> List.map solve_line
-|> List.fold_left (+) 0;;
+|> list_num;;
 
 let add_opt (n : int) (m_opt : int option) =
   match m_opt with

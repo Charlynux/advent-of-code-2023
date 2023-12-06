@@ -70,7 +70,7 @@ let solve_part1 (lines : string list) : int =
 |> List.map parse_game
 |> List.filter (fun g -> List.for_all is_possible_part1 g.sets)
 |> List.map (fun g -> g.id)
-  |> List.fold_left (+) 0;;
+  |> list_sum;;
 
 solve_part1 (read_lines "../../data/day02-example.input");;
 solve_part1 (read_lines "../../data/day02.input");;
@@ -88,7 +88,7 @@ let solve_part2 (lines : string list) =
   |> List.map parse_game
   |> List.map (fun g -> List.fold_left max_of_cubes empty_set g.sets)
   |> List.map (fun set -> set.red * set.green * set.blue)
-  |> List.fold_left (+) 0;;
+  |> list_sum;;
 
 solve_part2 (read_lines "../../data/day02-example.input");;
 solve_part2 (read_lines "../../data/day02.input");;
