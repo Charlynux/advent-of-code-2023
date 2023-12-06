@@ -1,3 +1,8 @@
+#load "str.cma";;
+
+#mod_use "utils.ml";;
+open Utils;;
+
 type converter = int -> int;;
 
 module Int =
@@ -34,18 +39,7 @@ let tmp = create_converter [(50, 98, 2);(52, 50, 48)];;
 tmp 0;;
 tmp 98;;
 
-let read_lines name : string list =
-  let ic = open_in name in
-  let try_read () =
-    try Some (input_line ic) with End_of_file -> None in
-  let rec loop acc = match try_read () with
-    | Some s -> loop (s :: acc)
-    | None -> close_in ic; List.rev acc in
-  loop [];;
-
 read_lines "../../data/day05-example.input";;
-
-#load "str.cma";;
 
 let parse_seeds s =
   let r = Str.regexp "seeds: \\(.*\\)" in
