@@ -25,3 +25,18 @@ let day06 = [(44, 283); (70, 1134); (70, 1134); (80, 1491)];;
 day06
 |> List.map solve_part1
 |> List.fold_left ( * ) 1;;
+
+solve_part1 (71530, 940200);; (* 71503 *)
+
+let solve_part2 (duration, record) =
+  let rec find_first f n =
+    if (record >= calculate_distance duration n) then
+      find_first f (f n)
+    else
+      n in
+  let min = find_first (fun x -> x + 1) 0
+  and max = find_first (fun x -> x - 1) duration in
+  max - min + 1;;
+
+solve_part2 (71530, 940200);; (* 71503 *)
+solve_part2 (44707080, 283113411341491);; (* TODO *)
