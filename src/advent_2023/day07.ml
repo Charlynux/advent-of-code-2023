@@ -88,3 +88,76 @@ let solve_part1 file = read_lines file
 
 solve_part1 "../../data/day07-example.input";;
 solve_part1 "../../data/day07.input";;
+
+let j_as_joker hand =
+  List.map (fun v -> if (v = 11) then 0 else v) hand;;
+
+(*
+  Five of a kind -> 6
+  Four of a kind -> 5
+  Full house -> 4
+  Three of a kind -> 3
+  Two pair -> 2
+  One pair -> 1
+  High card -> 0
+ *)
+
+let evaluate_hand_with_joker hand =
+  match frequencies hand with
+    [(_, 5)]
+  | [(0, 3); (_, 2)]
+  | [(0, 2); (_, 3)]
+  | [(0, 1); (_, 4)]
+  | [(0, 4); (_, 1)] -> 6
+
+  | [(0, _); b; c; d; e] -> 1
+  | [a; b; c; d; e] -> 0
+
+  | [(_, 4); (_, 1)]
+    | [(_, 1); (_, 4)] -> 5
+  | [_; _] -> 4
+
+  | [(0, 3); _; _] -> 5
+  | [(0, 2); _; _] -> 5
+  | [(0, 1); (_, n); (_, m)] when (n = 3) || (m = 3) -> 5
+
+  | [(0, 1); (_, 2); (_, 2)] -> 4
+  | [(0, 2); _; _; _] -> 3
+  | [(0, 1); _; _; _] -> 3
+
+  | (0, _) :: _ -> raise (Invalid_argument ("Unexpected Joker : " ^
+                                              (List.fold_left
+                                                 (fun acc v ->
+                                                   acc ^ (string_of_int v))
+                                                 ""
+                                                 hand)))
+  | f when List.exists (fun (_, n) -> n = 3) f -> 3
+
+  | [_; _; _] -> 2
+  | [_; _; _; _] -> 1
+  | _ -> raise (Invalid_argument "Impossible hand");;
+
+let compare_hands_with_joker a b =
+  let type_a = evaluate_hand_with_joker a
+  and type_b = evaluate_hand_with_joker b in
+  if type_a = type_b then
+    compare_lists a b
+  else
+    compare type_a type_b;;
+
+let solve_part2 file = read_lines file
+                       |> List.map parse_line
+                       |> List.map (fun (hand, value) -> (j_as_joker hand, value))
+                       |> List.sort
+                            (fun (hand_a, _) (hand_b, _) ->
+                              compare_hands_with_joker hand_a hand_b)
+                       |> List.mapi (fun i (_, v) -> v * (i + 1))
+                       |> list_sum;;
+
+solve_part2 "../../data/day07-example.input";;
+solve_part2 "../../data/day07.input";;
+(* 250950722 -> too low *)
+(* 250965300 -> too low *)
+(* 251683378 -> too low :'(*)
+(* 251548898 -> NOT THE RIGHT *)
+(*   252127335 -> SUCCESS *)
