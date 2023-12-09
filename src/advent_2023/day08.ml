@@ -34,7 +34,7 @@ let solve_part1 (map : instruction NodeMap.t) (directions : direction list) =
   loop directions "AAA" 0;;
 
 let parse_line s =
-  let r = Str.regexp "\\([A-Z]+\\) = (\\([A-Z]+\\), \\([A-Z]+\\))" in
+  let r = Str.regexp "\\([0-9A-Z]+\\) = (\\([0-9A-Z]+\\), \\([0-9A-Z]+\\))" in
   let _ = Str.search_forward r s 0 in
   ((Str.matched_group 1 s),
    ((Str.matched_group 2 s),
@@ -61,3 +61,39 @@ let (dirs, map) = parse_input (read_lines "../../data/day08-example.input") in
 
 let (dirs, map) = parse_input (read_lines "../../data/day08.input") in
     solve_part1 map dirs;;
+
+module NodeSet = Set.Make(Node);;
+
+
+
+let solve_part2 (map : instruction NodeMap.t) (directions : direction list) =
+  let rec loop (ds : direction list) nodes (n : int) =
+    if (List.is_empty ds) then
+      loop directions nodes n
+    else if (NodeSet.for_all
+               (fun n -> 'Z' = (String.get n 2))
+               nodes) then
+      n
+    else if (n > 200000) then
+      n
+     else
+      loop
+        (List.tl ds)
+        (NodeSet.map
+           (fun n -> (get_node (List.hd ds) (NodeMap.find n map)))
+           nodes)
+        (n + 1)
+  in
+  loop
+    directions
+    (NodeMap.to_list map
+     |> List.map fst
+     |> List.filter (fun n -> 'A' = (String.get n 2))
+     |> NodeSet.of_list)
+    0;;
+
+let (dirs, map) = parse_input (read_lines "../../data/day08-example2.input") in
+    solve_part2 map dirs;;
+
+let (dirs, map) = parse_input (read_lines "../../data/day08.input") in
+    solve_part2 map dirs;;
