@@ -34,7 +34,7 @@ let process numbers =
       history
     else
       loop
-        (history @ [line])
+        (line :: history)
         (process_line line) in
   loop [] numbers;;
 
@@ -57,3 +57,18 @@ let solve_part1 file =
 
 solve_part1 "../../data/day09-example.input";;
 solve_part1 "../../data/day09.input";;
+
+let extrapolate_back target (x :: _) = -(target - x);;
+
+let solve_part2 file =
+  file
+  |> parse_input
+  |> List.map process
+  |> List.map (List.fold_left extrapolate_back 0)
+  |> list_sum;;
+
+  #trace extrapolate_back;;
+  #untrace extrapolate_back;;
+
+solve_part2 "../../data/day09-example.input";;
+solve_part2 "../../data/day09.input";;
