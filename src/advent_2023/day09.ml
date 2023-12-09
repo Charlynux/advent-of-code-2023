@@ -48,17 +48,11 @@ let rec extrapolate_one target numbers =
 
 extrapolate_one 3 [5; 15];;
 
-let rec extrapolate target history =
-  match history with
-    [] -> target
-  | numbers :: tl -> extrapolate
-                       (extrapolate_one target numbers)
-                       tl;;
 let solve_part1 file =
   file
 |> parse_input
 |> List.map process
-|> List.map (extrapolate 0)
+|> List.map (List.fold_left extrapolate_one 0)
 |> list_sum;;
 
 solve_part1 "../../data/day09-example.input";;
