@@ -4,7 +4,7 @@ writefile =: 1!:2
 repository_folder =: '/Users/charles/git-repositories/advent-of-code-2023/'
 read_input =: readfile@<@(repository_folder&,)
 split_lines =: <;._2
-parse_numbers =: (".@>)
+parse_numbers =: (_&".@>)
 parse_input =: parse_numbers@split_lines@read_input
 exampleinput =: parse_input 'data/day09-example.input'
 
@@ -80,5 +80,4 @@ NB. {. @> { -> Extrait la première ligne pour chaque groupe
 NB. |: -> Transpose les lignes deviennent des colonnes
 NB. {. -/\. -> Cf. ci-dessus : C'est l'extrapolation demandée.
 NB. +/ -> On fait la somme des valeurs extrapôlées.
-+/ {. -/\. |: {. @> { (subtract_pairs^:(-.@all_zero))^:a: @>{exampleinput
-
++/ {. -/\. |: {. @> { (subtract_pairs^:(-.@all_zero))^:a: @>{parse_input 'data/day09.input'
