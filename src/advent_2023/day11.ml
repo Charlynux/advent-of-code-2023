@@ -82,7 +82,7 @@ let rec solve_part1 acc points =
 let full_solve_part1 expansion_size file =
   let ((x, y), m) = parse_map (read_lines file) in
     let x_expansions = find_expansions m fst x
-    and y_expansions = find_expansions m snd x in
+    and y_expansions = find_expansions m snd y in
     let expanded_map = m
                        |> expand_all_x expansion_size x_expansions
                        |> expand_all_y expansion_size y_expansions
