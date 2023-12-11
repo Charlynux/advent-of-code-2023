@@ -153,4 +153,20 @@ solve_part1 "../../data/day10-simple.input";;
 solve_part1 "../../data/day10-example.input";;
 solve_part1 "../../data/day10.input";;
 
-#untrace_all
+#untrace_all;;
+
+let explore file =
+  let m = parse_map (read_lines file) in
+  let s = find_starting_point m in
+  let s_neighbors = find_connected_neighbors m s in
+  let path = follow_pipe_until_s m s (List.hd s_neighbors) in
+  let all_coords = PointsMap.to_list m |> List.map fst in
+  Printf.printf
+    "Taille du plateau %d x %d\nTaille de la boucle %d\nPoints restants %d\n"
+    (all_coords |> List.map fst |> list_max)
+    (all_coords |> List.map snd |> list_max)
+    (List.length path)
+    ((List.length all_coords) - (List.length path))
+    ;;
+
+explore "../../data/day10.input";;
