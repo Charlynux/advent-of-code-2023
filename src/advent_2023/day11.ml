@@ -53,21 +53,22 @@ let find_expansions points f size =
            |> IntsSet.of_list in
   IntsSet.diff range vals |> IntsSet.to_list;;
 
-let expand_x start points =
-  PointsSet.map
-    (fun (x ,y) -> if (x > start) then
-                     ((x + 1), y)
-                   else
-                     (x, y))
-    points;;
+let expand_all_x expansion_size expansions points =
+  points
+  |> PointsSet.map
+       (fun (px, py) ->
+         (let n = List.filter (fun x -> x < px) expansions
+                |> List.length in
+          (px + (n * (expansion_size - 1)), py)));;
 
-let expand_y start points =
-  PointsSet.map
-    (fun (x ,y) -> if (y > start) then
-                     (x, y + 1)
-                   else
-                     (x, y))
-    points;;
+let expand_all_y expansion_size expansions points =
+  points
+  |> PointsSet.map
+       (fun (px, py) ->
+         (let n = List.filter (fun y -> y < py) expansions
+                  |> List.length in
+          (px, py + (n * (expansion_size - 1)))));;
+
 
 let manhattan_distance (ax, ay) (bx, by) = (abs (bx - ax)) + (abs (by - ay));;
 
@@ -78,16 +79,21 @@ let rec solve_part1 acc points =
                           (List.map (manhattan_distance p) rest)
                           rest);;
 
-let full_solve_part1 file =
+let full_solve_part1 expansion_size file =
   let ((x, y), m) = parse_map (read_lines file) in
     let x_expansions = find_expansions m fst x
     and y_expansions = find_expansions m snd x in
     let expanded_map = m
-                       |> List.fold_right expand_x x_expansions
-                       |> List.fold_right expand_y y_expansions
+                       |> expand_all_x expansion_size x_expansions
+                       |> expand_all_y expansion_size y_expansions
                        |> PointsSet.to_list in
     solve_part1 [] expanded_map
     |> list_sum;;
 
-full_solve_part1 "../../data/day11-example.input";;
-full_solve_part1 "../../data/day11.input";;
+full_solve_part1 2 "../../data/day11-example.input";;
+full_solve_part1 2 "../../data/day11.input";;
+
+full_solve_part1 10 "../../data/day11-example.input";;
+full_solve_part1 100 "../../data/day11-example.input";;
+
+full_solve_part1 1000000 "../../data/day11.input";;
