@@ -91,3 +91,6 @@ let solve_part2 input =
 
 solve_part2 "../../data/day12-example.input";;
 (* solve_part2 "../../data/day12.input";; *)
+
+let (pattern, groups) = expand_pattern ("?###????????", [3; 2; 1]) in
+    calculate_arrangements pattern groups;;
