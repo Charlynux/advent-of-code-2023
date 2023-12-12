@@ -45,3 +45,19 @@ calculate_arrangements "?#?#?#?#?#?#?#?" [1;3;1;6];; (* 1 arrangement *)
 calculate_arrangements "????.#...#..." [4;1;1];; (* 1 arrangement *)
 calculate_arrangements "????.######..#####." [1;6;5];; (* 4 arrangements *)
 calculate_arrangements "?###????????" [3;2;1];; (* 10 arrangements *)
+
+let parse_line line =
+  let pattern::groups::[] = String.split_on_char ' ' line in
+  (pattern,
+   groups |> String.split_on_char ',' |> List.map int_of_string);;
+
+parse_line "?###???????? 3,2,1";;
+
+let solve_part1 input =
+  read_lines input
+  |> List.map parse_line
+  |> List.map (fun (pattern, groups) -> calculate_arrangements pattern groups)
+  |> list_sum;;
+
+solve_part1 "../../data/day12-example.input";;
+solve_part1 "../../data/day12.input";;
