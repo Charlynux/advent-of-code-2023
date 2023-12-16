@@ -111,7 +111,11 @@ let step map (pos, dir) : (point * direction) list  =
 let solve_part1 input =
   let m = parse_input (read_lines input) in
     let rec loop energized beams =
-      let next_beams = List.concat_map (step m) beams in
+      let next_beams = List.concat_map (step m) beams
+                       (* On retire les rayons déjà explorés. *)
+                       |> BeamsSet.of_list
+                       |> (fun elt -> BeamsSet.diff elt energized)
+                       |> BeamsSet.to_list in
       (* let _ = print_map energized m; print_endline "" in *)
       let next_energized = List.fold_right
                              BeamsSet.add
