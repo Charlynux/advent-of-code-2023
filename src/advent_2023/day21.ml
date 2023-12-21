@@ -49,23 +49,31 @@ let neighbors (x, y) = [(x - 1, y); (x + 1, y);
 let in_bounds (max_x, max_y) (x, y) =
   (x >= 0 && x < max_x) && (y >= 0 && y < max_y);;
 
-let max_n = 64
-and (start, bounds, rocks) =
-  parse_input (read_lines "../../data/day21.input") in
-    match start with
-      None -> raise Not_found
-    | Some start_point ->
-       let rec loop opens n =
-         if (n > max_n || PointsSet.is_empty opens) then
-           opens
-         else
-           loop
-             (opens
-              |> PointsSet.to_list
-              |> List.concat_map neighbors
-              |> List.filter (in_bounds bounds)
-              |> PointsSet.of_list
-              |> (fun s -> PointsSet.diff s rocks))
-             (n + 1) in
-       loop (PointsSet.singleton start_point) 1
-       |> PointsSet.cardinal;;
+let solve_part_1
+      max_n
+      ((start, bounds, rocks) : point option * point * PointsSet.t)  =
+  match start with
+    None -> raise Not_found
+  | Some start_point ->
+     let rec loop opens n =
+       if (n > max_n || PointsSet.is_empty opens) then
+         opens
+       else
+         loop
+           (opens
+            |> PointsSet.to_list
+            |> List.concat_map neighbors
+            |> List.filter (in_bounds bounds)
+            |> PointsSet.of_list
+            |> (fun s -> PointsSet.diff s rocks))
+           (n + 1) in
+     loop (PointsSet.singleton start_point) 1;;
+
+
+parse_input (read_lines "../../data/day21-example.input")
+|> solve_part_1 6
+|> PointsSet.cardinal;;
+
+parse_input (read_lines "../../data/day21.input")
+|> solve_part_1 64
+|> PointsSet.cardinal;;
