@@ -81,3 +81,12 @@ NB. |: -> Transpose les lignes deviennent des colonnes
 NB. {. -/\. -> Cf. ci-dessus : C'est l'extrapolation demandée.
 NB. +/ -> On fait la somme des valeurs extrapôlées.
 +/ {. -/\. |: {. @> { (subtract_pairs^:(-.@all_zero))^:a: @>{parse_input 'data/day09.input'
+
+NB. Solution de https://github.com/jitwit/aoc/blob/a/J/23/09.ijs
+
+in =: parse_input 'data/day09.input'
++/(n,_1)p.~"1 in+/ .*"_ 1~%.^/~i.x:n=:{:$in
+
+dissect '+/(n,_1)p.~"1 in+/ .*"_ 1~%.^/~i.x:n=:{:$in' [ in =. parse_input 'data/day09-example.input'
+
+
